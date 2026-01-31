@@ -3,15 +3,72 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <title>Hai Pe Afară</title>
-    <link rel="manifest" href="manifest.json">
     <link rel="stylesheet" href="style.css">
 </head>
-<body>
-    <div id="root"></div>
-    <script src="script.js"></script>
-</body>
+<body style="background-color: #000; color: #fff; margin: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh; font-family: sans-serif;">
 
+    <div style="width: 100%; max-width: 400px; padding: 20px; text-align: center;">
+        <h1 style="color: #FF5F1F; font-size: 3rem; margin-bottom: 30px;">HAI PE AFARĂ</h1>
+        
+        <div style="background: rgba(255,255,255,0.05); padding: 25px; border-radius: 25px; border: 1px solid #333; display: flex; flex-direction: column; gap: 15px;">
+            <select id="vibe" style="background: #111; color: #00D9FF; padding: 15px; border-radius: 12px; border: 1px solid #444;">
+                <option value="">Alege Vibe-ul</option>
+                <option value="Chill/Explorare">Chill/Explorare</option>
+                <option value="Activ/Sport">Activ/Sport</option>
+                <option value="Caterincă/Random">Caterincă/Random</option>
+            </select>
+
+            <select id="buget" style="background: #111; color: #00D9FF; padding: 15px; border-radius: 12px; border: 1px solid #444;">
+                <option value="">Buget</option>
+                <option value="Sărac Lipit (0 lei)">Sărac Lipit (0 lei)</option>
+                <option value="Merge cinzeci de lei">50 lei</option>
+                <option value="Bogați (100+ lei)">100+ lei</option>
+            </select>
+
+            <button onclick="genereaza()" style="background: #FF5F1F; color: #000; padding: 18px; border-radius: 15px; border: none; font-weight: bold; cursor: pointer;">GĂSEȘTE IDEE</button>
+            <button onclick="genereaza(true)" style="background: transparent; color: #00D9FF; border: none; font-style: italic; cursor: pointer; margin-top: 10px;">Sunt Indecis</button>
+        </div>
+
+        <div id="rezultat" style="display: none; margin-top: 30px; padding: 20px; border: 2px solid #00D9FF; border-radius: 20px; background: rgba(0, 217, 255, 0.05);">
+            <p id="text-activitate" style="font-size: 1.2rem; margin-bottom: 20px;"></p>
+            <button onclick="share()" style="background: #25D366; color: #fff; padding: 12px 20px; border-radius: 12px; border: none; font-weight: bold; cursor: pointer;">Trimite pe WhatsApp 🚀</button>
+        </div>
+    </div>
+
+    <script>
+        let activitateCurenta = "";
+
+        async function genereaza(isRandom = false) {
+            const v = document.getElementById('vibe').value;
+            const b = document.getElementById('buget').value;
+            const resDiv = document.getElementById('rezultat');
+            const txt = document.getElementById('text-activitate');
+
+            let url = isRandom 
+                ? 'https://hai-pe-afara.onrender.com/random' 
+                : `https://hai-pe-afara.onrender.com/get-activity?vibe=${encodeURIComponent(v)}&buget=${encodeURIComponent(b)}`;
+
+            try {
+                const response = await fetch(url);
+                const data = await response.json();
+                
+                if (data.text) {
+                    activitateCurenta = data.text;
+                    txt.innerText = data.text;
+                    resDiv.style.display = 'block';
+                } else {
+                    alert("Nu am găsit activități pentru aceste filtre. Încearcă 'Sunt Indecis'!");
+                }
+            } catch (e) {
+                alert("Serverul se trezește... mai apasă o dată în 10 secunde!");
+            }
+        }
+
+        function share() {
+            const msg = `Plan de ieșeală: ${activitateCurenta}! Te bagi? 🚀`;
+            window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, '_blank');
+        }
+    </script>
+</body>
 </html>
