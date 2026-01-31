@@ -2,13 +2,12 @@
 <html lang="ro">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Workspace Alex</title>
 
     <link rel="apple-touch-icon" href="icon.png">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <link rel="icon" type="image/png" href="icon.png">
 
     <style>
         :root {
@@ -18,7 +17,6 @@
             --accent: #4f46e5;
             --border: #e5e7eb;
             --item-bg: #ffffff;
-            --shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
             --sidebar-width: 260px;
         }
 
@@ -33,12 +31,11 @@
 
         body {
             margin: 0;
-            font-family: 'Inter', system-ui, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
             display: flex;
             height: 100vh;
             background-color: var(--main-bg);
             color: var(--text-color);
-            transition: 0.3s;
             overflow: hidden;
         }
 
@@ -50,23 +47,20 @@
             display: flex;
             flex-direction: column;
             padding: 30px 20px;
-            box-sizing: border-box;
-            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             position: relative;
-            z-index: 10;
+            z-index: 100;
+            flex-shrink: 0;
         }
 
-        /* Starea când meniul este strâns */
         .sidebar.collapsed {
-            transform: translateX(-100%);
-            position: absolute;
+            margin-left: calc(-1 * var(--sidebar-width));
         }
 
-        /* Butonul Săgeată */
         .toggle-btn {
             position: absolute;
             right: -35px;
-            top: 25px;
+            top: 20px;
             width: 35px;
             height: 40px;
             background: var(--accent);
@@ -77,107 +71,92 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            font-weight: bold;
-            box-shadow: 4px 0 10px rgba(0,0,0,0.1);
             font-size: 1.2rem;
-            z-index: 11;
+            box-shadow: 2px 0 5px rgba(0,0,0,0.1);
         }
 
-        .sidebar-header { 
-            display: flex; 
-            align-items: center; 
-            gap: 12px; 
-            margin-bottom: 40px; 
-        }
-
-        /* Iconița ta oficială în Sidebar */
-        .app-icon-img {
+        .sidebar-header { display: flex; align-items: center; gap: 12px; margin-bottom: 40px; }
+        
+        /* Iconița inteligentă: Arată poza, dacă nu, arată litera A */
+        .app-icon-container {
             width: 40px;
             height: 40px;
-            object-fit: cover;
             border-radius: 10px;
-            background: white;
-            box-shadow: var(--shadow);
+            background: var(--accent);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            color: white;
+            font-weight: bold;
+            font-size: 1.2rem;
         }
+        .app-icon-container img { width: 100%; height: 100%; object-fit: cover; }
 
-        .sidebar h2 { 
-            font-size: 1.1rem; 
-            margin: 0; 
-            font-weight: 800; 
-            color: var(--accent);
-            letter-spacing: 0.5px;
-        }
+        .sidebar h2 { font-size: 1rem; margin: 0; font-weight: 800; color: var(--accent); }
 
         .nav-btn {
-            display: flex; align-items: center; gap: 15px; padding: 14px 18px; border: none;
+            display: flex; align-items: center; gap: 12px; padding: 14px; border: none;
             border-radius: 12px; background: transparent; color: var(--text-color);
-            font-weight: 600; cursor: pointer; transition: 0.2s; margin-bottom: 8px; width: 100%;
+            font-weight: 600; cursor: pointer; transition: 0.2s; margin-bottom: 5px; width: 100%;
         }
+        .nav-btn.active { background: var(--accent); color: white; }
 
-        .nav-btn.active { background: var(--accent); color: white; box-shadow: 0 4px 12px rgba(79, 70, 229, 0.2); }
+        .theme-switch { margin-top: auto; padding: 10px; cursor: pointer; border: 1px solid var(--border); border-radius: 10px; text-align: center; font-size: 0.8rem; }
 
-        .theme-switch { margin-top: auto; padding: 12px; cursor: pointer; border: 2px solid var(--border); border-radius: 12px; text-align: center; font-weight: 700; }
-
-        /* --- CONTENT --- */
+        /* --- MAIN CONTENT --- */
         .main-content {
             flex: 1;
-            padding: 50px 20px;
+            padding: 40px 20px;
             overflow-y: auto;
             display: flex;
             flex-direction: column;
             align-items: center;
-            transition: all 0.3s;
+            width: 100%;
         }
 
-        .content-container { width: 100%; max-width: 600px; }
+        .content-container { width: 100%; max-width: 500px; }
 
-        .progress-card { background: var(--item-bg); padding: 20px; border-radius: 20px; box-shadow: var(--shadow); margin-bottom: 30px; }
-        .bar-bg { height: 10px; background: var(--border); border-radius: 10px; margin-top: 10px; overflow: hidden; }
-        #bar-fill { height: 100%; background: var(--accent); width: 0%; transition: 0.6s cubic-bezier(0.22, 1, 0.36, 1); }
+        .progress-card { background: var(--item-bg); padding: 15px; border-radius: 15px; border: 1px solid var(--border); margin-bottom: 20px; }
+        .bar-bg { height: 8px; background: var(--border); border-radius: 10px; margin-top: 8px; overflow: hidden; }
+        #bar-fill { height: 100%; background: var(--accent); width: 0%; transition: 0.4s; }
 
-        .input-group { display: flex; gap: 10px; margin-bottom: 30px; }
-        input[type="text"] { flex: 1; padding: 15px; border-radius: 12px; border: 2px solid var(--border); background: var(--item-bg); color: var(--text-color); outline: none; transition: 0.2s; }
-        input[type="text"]:focus { border-color: var(--accent); }
-        .add-btn { background: var(--accent); color: white; border: none; padding: 0 20px; border-radius: 12px; cursor: pointer; font-weight: bold; }
+        .input-group { display: flex; gap: 8px; margin-bottom: 20px; }
+        input[type="text"] { flex: 1; padding: 12px; border-radius: 10px; border: 1px solid var(--border); background: var(--item-bg); color: var(--text-color); outline: none; }
+        .add-btn { background: var(--accent); color: white; border: none; padding: 0 15px; border-radius: 10px; font-weight: bold; cursor: pointer; }
 
-        ul { list-style: none; padding: 0; }
-        li { background: var(--item-bg); margin-bottom: 10px; padding: 15px; border-radius: 12px; display: flex; align-items: center; gap: 15px; box-shadow: var(--shadow); animation: fadeIn 0.3s ease; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-
-        .item-text { flex: 1; cursor: pointer; outline: none; }
-        .item-text.editing { background: var(--main-bg); padding: 5px; border-radius: 5px; box-shadow: inset 0 0 0 2px var(--accent); }
+        ul { list-style: none; padding: 0; margin: 0; }
+        li { background: var(--item-bg); margin-bottom: 8px; padding: 12px; border-radius: 10px; display: flex; align-items: center; gap: 10px; border: 1px solid var(--border); }
+        .item-text { flex: 1; outline: none; }
+        .item-text.editing { background: var(--main-bg); padding: 2px 5px; border-radius: 4px; }
         .done-text { text-decoration: line-through; opacity: 0.4; }
-        .delete-btn { color: #ef4444; cursor: pointer; font-weight: bold; padding: 5px; }
+        .delete-btn { color: #ef4444; cursor: pointer; padding: 5px; font-size: 0.9rem; }
 
         .hidden { display: none !important; }
-
-        /* Ajustări Mobile */
-        @media (max-width: 768px) {
-            .sidebar { position: fixed; height: 100%; }
-            .sidebar.collapsed + .main-content { margin-left: 0; }
-        }
     </style>
 </head>
 <body data-theme="light">
 
     <div class="sidebar" id="sidebar">
-        <button class="toggle-btn" onclick="toggleSidebar()" id="toggle-icon" title="Toggle Menu">❮</button>
+        <button class="toggle-btn" onclick="toggleSidebar()">❮</button>
         <div class="sidebar-header">
-            <img src="icon.png" alt="Logo" class="app-icon-img" onerror="this.style.background='var(--accent)'">
+            <div class="app-icon-container">
+                <img src="icon.png" onerror="this.style.display='none'; this.parentElement.innerText='A';">
+            </div>
             <h2>WORKSPACE</h2>
         </div>
         <button id="btn-tasks" class="nav-btn active" onclick="handleNav('tasks')">📅 Task-uri</button>
         <button id="btn-notes" class="nav-btn" onclick="handleNav('notes')">📝 Liste</button>
-        <div class="theme-switch" onclick="toggleTheme()">🌓 Tema</div>
+        <div class="theme-switch" onclick="toggleTheme()">🌓 Schimbă Tema</div>
     </div>
 
     <div class="main-content">
         <div class="content-container">
-            <h1 id="view-title">Task-uri</h1>
-            <p style="font-size: 0.8rem; opacity: 0.6; margin-bottom: 25px;">Dublu-click pentru editare rapidă</p>
+            <h1 id="view-title" style="font-size: 1.5rem; margin-bottom: 5px;">Task-uri</h1>
+            <p style="font-size: 0.75rem; opacity: 0.5; margin-bottom: 20px;">Dublu-click pentru a edita</p>
 
             <div id="progress-wrapper" class="progress-card">
-                <div style="display:flex; justify-content:space-between; font-weight:bold; font-size: 0.8rem;">
+                <div style="display:flex; justify-content:space-between; font-size: 0.7rem; font-weight:bold;">
                     <span>PROGRES</span>
                     <span id="perc-text">0%</span>
                 </div>
@@ -185,7 +164,7 @@
             </div>
 
             <div class="input-group">
-                <input type="text" id="user-input" placeholder="Adaugă ceva nou...">
+                <input type="text" id="user-input" placeholder="Adaugă ceva...">
                 <button class="add-btn" onclick="addItem()">+</button>
             </div>
             <ul id="list"></ul>
@@ -198,43 +177,19 @@
         let notes = JSON.parse(localStorage.getItem('alex_notes')) || [];
 
         function toggleSidebar() {
-            const sidebar = document.getElementById('sidebar');
-            const btn = document.getElementById('toggle-icon');
-            sidebar.classList.toggle('collapsed');
-            btn.innerText = sidebar.classList.contains('collapsed') ? '❯' : '❮';
+            const sb = document.getElementById('sidebar');
+            sb.classList.toggle('collapsed');
+            const btn = sb.querySelector('.toggle-btn');
+            btn.innerText = sb.classList.contains('collapsed') ? '❯' : '❮';
         }
 
-        function handleNav(newView) {
-            view = newView;
-            
-            // Auto-Hide pe mobil: dacă ecrantul e mic, închidem meniul automat
-            if (window.innerWidth <= 768) {
-                const sidebar = document.getElementById('sidebar');
-                if (!sidebar.classList.contains('collapsed')) {
-                    toggleSidebar();
-                }
-            }
-            
+        function handleNav(v) {
+            view = v;
+            if (window.innerWidth <= 768) toggleSidebar();
             document.getElementById('btn-tasks').classList.toggle('active', view === 'tasks');
             document.getElementById('btn-notes').classList.toggle('active', view === 'notes');
             document.getElementById('view-title').innerText = view === 'tasks' ? 'Task-uri' : 'Liste';
             document.getElementById('progress-wrapper').classList.toggle('hidden', view === 'notes');
-            render();
-        }
-
-        function saveData() {
-            localStorage.setItem('alex_tasks', JSON.stringify(tasks));
-            localStorage.setItem('alex_notes', JSON.stringify(notes));
-        }
-
-        function addItem() {
-            const input = document.getElementById('user-input');
-            if (!input.value.trim()) return;
-            const item = { text: input.value, completed: false };
-            if (view === 'tasks') tasks.push(item);
-            else notes.push(item);
-            input.value = '';
-            saveData();
             render();
         }
 
@@ -245,46 +200,49 @@
 
             data.forEach((item, index) => {
                 const li = document.createElement('li');
-                const check = view === 'tasks' ? 
-                    `<input type="checkbox" style="width:18px; height:18px; cursor:pointer;" ${item.completed ? 'checked' : ''} onchange="toggleItem(${index})">` : '';
-
+                const check = view === 'tasks' ? `<input type="checkbox" ${item.completed ? 'checked' : ''} onchange="toggleItem(${index})">` : '';
                 li.innerHTML = `
                     ${check}
                     <span class="item-text ${item.completed ? 'done-text' : ''}" id="item-${index}">${item.text}</span>
                     <div class="delete-btn" onclick="deleteItem(${index})">✕</div>
                 `;
-
-                const textSpan = li.querySelector(`#item-${index}`);
-                textSpan.addEventListener('dblclick', function() {
-                    this.contentEditable = "true";
-                    this.classList.add('editing');
-                    this.focus();
-                    this.onblur = () => {
-                        if(this.innerText.trim() !== "") {
-                            data[index].text = this.innerText.trim();
-                            saveData();
-                        }
-                        this.contentEditable = "false";
-                        this.classList.remove('editing');
+                const span = li.querySelector(`#item-${index}`);
+                span.ondblclick = () => {
+                    span.contentEditable = true;
+                    span.classList.add('editing');
+                    span.focus();
+                    span.onblur = () => {
+                        data[index].text = span.innerText;
+                        localStorage.setItem('alex_'+view, JSON.stringify(data));
                         render();
                     };
-                    this.onkeydown = (e) => { if(e.key === "Enter") this.blur(); };
-                });
+                    span.onkeydown = (e) => { if(e.key === 'Enter') span.blur(); };
+                };
                 listEl.appendChild(li);
             });
-            if (view === 'tasks') updateProgress();
+            if(view === 'tasks') updateProgress();
+        }
+
+        function addItem() {
+            const input = document.getElementById('user-input');
+            if(!input.value.trim()) return;
+            const data = (view === 'tasks') ? tasks : notes;
+            data.push({text: input.value, completed: false});
+            input.value = '';
+            localStorage.setItem('alex_'+view, JSON.stringify(data));
+            render();
         }
 
         function toggleItem(idx) {
             tasks[idx].completed = !tasks[idx].completed;
-            saveData();
+            localStorage.setItem('alex_tasks', JSON.stringify(tasks));
             render();
         }
 
         function deleteItem(idx) {
             const data = (view === 'tasks') ? tasks : notes;
             data.splice(idx, 1);
-            saveData();
+            localStorage.setItem('alex_'+view, JSON.stringify(data));
             render();
         }
 
@@ -292,22 +250,17 @@
             const total = tasks.length;
             const done = tasks.filter(t => t.completed).length;
             const p = total === 0 ? 0 : Math.round((done / total) * 100);
-            const bar = document.getElementById('bar-fill');
-            const txt = document.getElementById('perc-text');
-            if(bar) bar.style.width = p + '%';
-            if(txt) txt.innerText = p + '%';
+            document.getElementById('bar-fill').style.width = p + '%';
+            document.getElementById('perc-text').innerText = p + '%';
         }
 
         function toggleTheme() {
-            const body = document.body;
-            body.setAttribute('data-theme', body.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
+            const b = document.body;
+            b.setAttribute('data-theme', b.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
         }
 
-        document.getElementById('user-input').addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') addItem();
-        });
-
-        window.onload = render;
+        document.getElementById('user-input').onkeypress = (e) => { if(e.key === 'Enter') addItem(); };
+        render();
     </script>
 </body>
 </html>
