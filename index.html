@@ -30,7 +30,6 @@
                     Găsește Rețetă
                 </button>
             </div>
-            <p class="text-xs text-slate-500 mt-3 italic">* Separă ingredientele prin virgulă.</p>
         </div>
 
         <div id="loader" class="hidden flex flex-col items-center my-10">
@@ -40,19 +39,15 @@
 
         <div id="recipeResult" class="hidden glass p-8 rounded-3xl leading-relaxed shadow-2xl">
             <h2 id="recipeTitle" class="text-2xl font-bold text-green-400 mb-4 text-center border-b border-slate-700 pb-4"></h2>
-            <div id="recipeContent" class="text-slate-200 whitespace-pre-wrap text-lg">
-                </div>
+            <div id="recipeContent" class="text-slate-200 whitespace-pre-wrap text-lg"></div>
             <div class="mt-8 flex justify-between items-center border-t border-slate-700 pt-6">
-                <button onclick="window.print()" class="text-sm text-slate-400 hover:text-white underline">
-                    Printează rețeta
-                </button>
-                <span class="text-xs text-slate-500 italic">Generat de Food Rescue AI v1.0</span>
+                <button onclick="window.print()" class="text-sm text-slate-400 hover:text-white underline">Printează rețeta</button>
             </div>
         </div>
     </div>
 
     <script>
-        // Am curățat cheia de eventuale spații invizibile
+        // Cheia ta este deja inclusă și curățată
         const API_KEY = "AIzaSyAUM2IoTeenYiRWwOxGywAbPItesVTklkw".trim();
 
         async function generateRecipe() {
@@ -68,12 +63,11 @@
                 return;
             }
 
-            // UI Reset
             loader.classList.remove('hidden');
             resultDiv.classList.add('hidden');
 
-            // URL formatat dintr-o singură bucată pentru a evita eroarea 404
-            const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${API_KEY}`;
+            // URL-ul ACTUALIZAT la versiunea v1 (stabilă)
+            const API_URL = `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${API_KEY}`;
 
             try {
                 const response = await fetch(API_URL, {
@@ -82,23 +76,20 @@
                     body: JSON.stringify({
                         contents: [{
                             parts: [{
-                                text: `Ești un Masterchef. Am 17 ani și am aceste ingrediente: ${ingredients}. Propune-mi o singură rețetă rapidă, delicioasă, cu un nume creativ și pași numerotați.`
+                                text: `Propune o rețetă rapidă pentru: ${ingredients}. Pune un titlu și pași clari.`
                             }]
                         }]
                     })
                 });
 
-                if (!response.ok) {
-                    const errorData = await response.json();
-                    throw new Error(errorData.error ? errorData.error.message : "Eroare la serverul Google");
-                }
-
                 const data = await response.json();
+
+                if (data.error) {
+                    throw new Error(data.error.message);
+                }
 
                 if (data.candidates && data.candidates[0].content.parts[0].text) {
                     let recipeText = data.candidates[0].content.parts[0].text;
-                    
-                    // Curățăm caracterele Markdown tipice (stelutele) pentru un aspect mai curat
                     recipeText = recipeText.replace(/\*\*/g, '').replace(/\*/g, '•');
 
                     titleDiv.innerText = "Rețeta ta e gata! 👨‍🍳";
@@ -106,11 +97,8 @@
                     
                     loader.classList.add('hidden');
                     resultDiv.classList.remove('hidden');
-                    
-                    // Scroll lin către rezultat
-                    resultDiv.scrollIntoView({ behavior: 'smooth' });
                 } else {
-                    throw new Error("Formatul răspunsului AI nu este cel așteptat.");
+                    throw new Error("Nu am putut genera rețeta. Încearcă alte ingrediente.");
                 }
 
             } catch (error) {
@@ -119,13 +107,6 @@
                 loader.classList.add('hidden');
             }
         }
-
-        // Permite apăsarea tastei Enter pentru a genera
-        document.getElementById('ingredientInput').addEventListener('keypress', function (e) {
-            if (e.key === 'Enter') {
-                generateRecipe();
-            }
-        });
     </script>
 </body>
 </html>
