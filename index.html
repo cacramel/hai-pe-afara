@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Workspace Alex v2</title>
+    
+    <link rel="icon" type="image/png" href="icon.png">
+
     <style>
         :root {
             --sidebar-bg: #ffffff;
@@ -46,7 +49,21 @@
             box-sizing: border-box;
         }
 
-        .sidebar h2 { font-size: 1.4rem; margin-bottom: 30px; color: var(--accent); }
+        .sidebar-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 30px;
+        }
+
+        .app-icon {
+            width: 32px;
+            height: 32px;
+            object-fit: contain;
+            border-radius: 6px;
+        }
+
+        .sidebar h2 { font-size: 1.3rem; margin: 0; color: var(--accent); }
 
         .nav-btn {
             display: flex;
@@ -157,7 +174,11 @@
 <body data-theme="light">
 
     <div class="sidebar">
-        <h2>Workspace</h2>
+        <div class="sidebar-header">
+            <img src="icon.png" alt="Logo" class="app-icon" onerror="this.style.display='none'">
+            <h2>Workspace</h2>
+        </div>
+        
         <button id="btn-tasks" class="nav-btn active" onclick="setView('tasks')">
             <span>📅</span> Task-uri
         </button>
@@ -191,6 +212,7 @@
     </div>
 
     <script>
+        // Logica rămâne aceeași ca în versiunea anterioară
         let view = 'tasks';
         let tasks = JSON.parse(localStorage.getItem('alex_tasks')) || [];
         let notes = JSON.parse(localStorage.getItem('alex_notes')) || [];
@@ -247,11 +269,9 @@
             if (view === 'tasks') updateProgress();
         }
 
-        // --- LOGICA DE EDITARE ---
         function makeEditable(el, index) {
             el.contentEditable = "true";
             el.focus();
-            // Selectăm tot textul pentru o editare mai ușoară
             const range = document.createRange();
             range.selectNodeContents(el);
             const sel = window.getSelection();
@@ -262,25 +282,22 @@
         function saveEdit(el, index) {
             const newText = el.innerText.trim();
             if (newText === "") {
-                render(); // Revenim la textul vechi dacă e gol
+                render();
                 return;
             }
             const data = (view === 'tasks') ? tasks : notes;
             data[index].text = newText;
             el.contentEditable = "false";
             saveData();
-            // Nu apelăm render() aici pentru a evita flicker-ul, 
-            // dar updatăm progresul dacă e cazul
             if (view === 'tasks') updateProgress();
         }
 
         function checkEnter(e, el) {
             if (e.key === "Enter") {
-                e.preventDefault(); // Să nu sară la rând nou
-                el.blur(); // Trigger la saveEdit
+                e.preventDefault();
+                el.blur();
             }
         }
-        // -------------------------
 
         function toggleItem(idx) {
             const data = (view === 'tasks') ? tasks : notes;
