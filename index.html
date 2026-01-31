@@ -8,8 +8,8 @@
     <style>
         body { background-color: #0f172a; color: white; font-family: 'Inter', sans-serif; }
         .glass { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1); }
-        .loader { border-top-color: #22c55e; animation: spinner 1.5s linear infinite; }
-        @keyframes spinner { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .loader { border: 4px solid #1e293b; border-top: 4px solid #22c55e; border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 </head>
 <body class="min-h-screen flex flex-col items-center p-4 md:p-10">
@@ -24,7 +24,7 @@
             <label class="block text-sm font-medium mb-2 text-slate-300">Ce ingrediente ai?</label>
             <div class="flex gap-2">
                 <input type="text" id="ingredientInput" placeholder="ex: pui, smântână, cartofi..." 
-                       class="flex-1 bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-green-500 transition-all">
+                       class="flex-1 bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-green-500 transition-all text-white">
                 <button onclick="generateRecipe()" 
                         class="bg-green-500 hover:bg-green-600 text-slate-900 font-bold px-6 py-3 rounded-xl transition-all active:scale-95">
                     Găsește Rețetă
@@ -34,80 +34,98 @@
         </div>
 
         <div id="loader" class="hidden flex flex-col items-center my-10">
-            <div class="loader w-12 h-12 border-4 border-slate-700 rounded-full mb-4"></div>
+            <div class="loader mb-4"></div>
             <p class="text-green-400 animate-pulse">Chef Gemini analizează ingredientele...</p>
         </div>
 
-        <div id="recipeResult" class="hidden glass p-8 rounded-3xl leading-relaxed">
-            <h2 id="recipeTitle" class="text-2xl font-bold text-green-400 mb-4 text-center"></h2>
-            <div id="recipeContent" class="text-slate-200 whitespace-pre-line">
+        <div id="recipeResult" class="hidden glass p-8 rounded-3xl leading-relaxed shadow-2xl">
+            <h2 id="recipeTitle" class="text-2xl font-bold text-green-400 mb-4 text-center border-b border-slate-700 pb-4"></h2>
+            <div id="recipeContent" class="text-slate-200 whitespace-pre-wrap text-lg">
                 </div>
-            <button onclick="window.print()" class="mt-6 text-sm text-slate-500 hover:text-white underline">
-                Printează rețeta
-            </button>
+            <div class="mt-8 flex justify-between items-center border-t border-slate-700 pt-6">
+                <button onclick="window.print()" class="text-sm text-slate-400 hover:text-white underline">
+                    Printează rețeta
+                </button>
+                <span class="text-xs text-slate-500 italic">Generat de Food Rescue AI v1.0</span>
+            </div>
         </div>
     </div>
 
     <script>
-        // CONFIGURARE: Pune cheia ta mai jos
-        const API_KEY = "AIzaSyAUM2IoTeenYiRWwOxGywAbPItesVTklkw"; 
+        // Am curățat cheia de eventuale spații invizibile
+        const API_KEY = "AIzaSyAUM2IoTeenYiRWwOxGywAbPItesVTklkw".trim();
 
         async function generateRecipe() {
-    const ingredients = document.getElementById('ingredientInput').value;
-    const loader = document.getElementById('loader');
-    const resultDiv = document.getElementById('recipeResult');
-    const contentDiv = document.getElementById('recipeContent');
-    const titleDiv = document.getElementById('recipeTitle');
+            const input = document.getElementById('ingredientInput');
+            const ingredients = input.value.trim();
+            const loader = document.getElementById('loader');
+            const resultDiv = document.getElementById('recipeResult');
+            const contentDiv = document.getElementById('recipeContent');
+            const titleDiv = document.getElementById('recipeTitle');
 
-    if (!ingredients) {
-        alert("Te rog scrie măcar un ingredient!");
-        return;
-    }
+            if (!ingredients) {
+                alert("Te rog scrie măcar un ingredient!");
+                return;
+            }
 
-    loader.classList.remove('hidden');
-    resultDiv.classList.add('hidden');
+            // UI Reset
+            loader.classList.remove('hidden');
+            resultDiv.classList.add('hidden');
 
-    // URL-ul CORECT pentru Gemini 1.5 Flash
-    const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${API_KEY}`;
+            // URL formatat dintr-o singură bucată pentru a evita eroarea 404
+            const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${API_KEY}`;
 
-    try {
-        const response = await fetch(API_URL, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                contents: [{
-                    parts: [{
-                        text: `Propune o rețetă pentru aceste ingrediente: ${ingredients}. Ton prietenos, pași clari.`
-                    }]
-                }]
-            })
+            try {
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        contents: [{
+                            parts: [{
+                                text: `Ești un Masterchef. Am 17 ani și am aceste ingrediente: ${ingredients}. Propune-mi o singură rețetă rapidă, delicioasă, cu un nume creativ și pași numerotați.`
+                            }]
+                        }]
+                    })
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error ? errorData.error.message : "Eroare la serverul Google");
+                }
+
+                const data = await response.json();
+
+                if (data.candidates && data.candidates[0].content.parts[0].text) {
+                    let recipeText = data.candidates[0].content.parts[0].text;
+                    
+                    // Curățăm caracterele Markdown tipice (stelutele) pentru un aspect mai curat
+                    recipeText = recipeText.replace(/\*\*/g, '').replace(/\*/g, '•');
+
+                    titleDiv.innerText = "Rețeta ta e gata! 👨‍🍳";
+                    contentDiv.innerText = recipeText;
+                    
+                    loader.classList.add('hidden');
+                    resultDiv.classList.remove('hidden');
+                    
+                    // Scroll lin către rezultat
+                    resultDiv.scrollIntoView({ behavior: 'smooth' });
+                } else {
+                    throw new Error("Formatul răspunsului AI nu este cel așteptat.");
+                }
+
+            } catch (error) {
+                console.error("Eroare detaliată:", error);
+                alert("Ups! " + error.message);
+                loader.classList.add('hidden');
+            }
+        }
+
+        // Permite apăsarea tastei Enter pentru a genera
+        document.getElementById('ingredientInput').addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') {
+                generateRecipe();
+            }
         });
-
-        const data = await response.json();
-
-        // Verificăm dacă Google a trimis o eroare în JSON
-        if (data.error) {
-            throw new Error(data.error.message);
-        }
-
-        if (data.candidates && data.candidates[0].content.parts[0].text) {
-            const recipeText = data.candidates[0].content.parts[0].text;
-            titleDiv.innerText = "Rețeta ta e gata! 👨‍🍳";
-            contentDiv.innerText = recipeText;
-            
-            loader.classList.add('hidden');
-            resultDiv.classList.remove('hidden');
-        } else {
-            throw new Error("Format răspuns invalid");
-        }
-
-    } catch (error) {
-        console.error("Eroare detaliată:", error);
-        alert("Eroare: " + error.message);
-        loader.classList.add('hidden');
-    }
-}
     </script>
 </body>
 </html>
-
