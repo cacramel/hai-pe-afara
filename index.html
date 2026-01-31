@@ -10,36 +10,36 @@
             --container-bg: #ffffff;
             --text-color: #1c1e21;
             --accent-color: #6366f1;
+            --tab-inactive: #e4e6eb;
             --border-color: #dddfe2;
-            --shadow: 0 10px 25px rgba(0,0,0,0.05);
-            --progress-bg: #e4e6eb;
+            --shadow: 0 10px 25px rgba(0,0,0,0.1);
         }
 
         [data-theme="dark"] {
             --bg-color: #0b0f1a;
             --container-bg: #161b28;
-            --text-color: #e4e6eb;
+            --text-color: #f0f2f5;
             --accent-color: #818cf8;
+            --tab-inactive: #2d3343;
             --border-color: #2d3343;
-            --shadow: 0 10px 25px rgba(0,0,0,0.3);
-            --progress-bg: #2d3343;
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Inter', system-ui, sans-serif;
             background-color: var(--bg-color);
             color: var(--text-color);
             display: flex;
             justify-content: center;
             padding: 40px 20px;
-            transition: all 0.3s ease;
+            transition: 0.3s;
+            margin: 0;
         }
 
         .container {
             width: 100%;
             max-width: 450px;
             background: var(--container-bg);
-            border-radius: 20px;
+            border-radius: 24px;
             padding: 25px;
             box-shadow: var(--shadow);
         }
@@ -48,137 +48,105 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 20px;
+            margin-bottom: 25px;
         }
 
-        /* Stil Tab-uri */
-        .tabs {
+        /* --- TABURI VIZIBILE --- */
+        .tabs-container {
             display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
-            background: var(--progress-bg);
-            padding: 5px;
-            border-radius: 12px;
+            background: var(--tab-inactive);
+            padding: 6px;
+            border-radius: 14px;
+            margin-bottom: 25px;
+            gap: 5px;
         }
 
         .tab-btn {
             flex: 1;
-            padding: 10px;
+            padding: 12px;
             border: none;
-            background: none;
-            color: var(--text-color);
+            border-radius: 10px;
             cursor: pointer;
-            border-radius: 8px;
-            font-weight: 600;
+            font-weight: 700;
+            font-size: 0.9rem;
             transition: 0.2s;
+            background: transparent;
+            color: var(--text-color);
         }
 
         .tab-btn.active {
-            background: var(--container-bg);
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            background: var(--accent-color);
+            color: white;
+            box-shadow: 0 4px 10px rgba(99, 102, 241, 0.3);
         }
 
         /* Progres Bar */
-        .progress-container {
-            margin-bottom: 20px;
-            display: none; /* Ascuns implicit */
-        }
+        .progress-container { margin-bottom: 20px; }
+        .progress-info { display: flex; justify-content: space-between; font-size: 0.85rem; margin-bottom: 8px; font-weight: 600; }
+        .bar-outer { width: 100%; height: 10px; background: var(--tab-inactive); border-radius: 10px; }
+        #bar-inner { width: 0%; height: 100%; background: var(--accent-color); border-radius: 10px; transition: 0.4s; }
 
-        .progress-info {
-            display: flex;
-            justify-content: space-between;
-            font-size: 0.9rem;
-            margin-bottom: 8px;
-        }
-
-        .bar-outer {
-            width: 100%;
-            height: 10px;
-            background: var(--progress-bg);
-            border-radius: 10px;
-            overflow: hidden;
-        }
-
-        #bar-inner {
-            width: 0%;
-            height: 100%;
-            background: var(--accent-color);
-            transition: width 0.4s ease;
-        }
-
-        /* Inputs */
-        .input-box {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-
+        /* Input Section */
+        .input-box { display: flex; gap: 10px; margin-bottom: 20px; }
         input {
             flex: 1;
-            padding: 12px;
-            border-radius: 10px;
+            padding: 14px;
+            border-radius: 12px;
             border: 2px solid var(--border-color);
             background: var(--container-bg);
             color: var(--text-color);
             outline: none;
+            font-size: 1rem;
         }
+        input:focus { border-color: var(--accent-color); }
 
         .add-btn {
             background: var(--accent-color);
             color: white;
             border: none;
-            padding: 0 20px;
-            border-radius: 10px;
+            width: 50px;
+            border-radius: 12px;
             cursor: pointer;
-            font-weight: bold;
+            font-size: 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         /* Liste */
-        ul { list-style: none; padding: 0; }
-
+        ul { list-style: none; padding: 0; margin: 0; }
         li {
             display: flex;
             align-items: center;
-            padding: 12px;
+            padding: 14px;
             background: var(--bg-color);
-            margin-bottom: 8px;
-            border-radius: 10px;
-            animation: slideIn 0.2s ease;
+            margin-bottom: 10px;
+            border-radius: 12px;
+            transition: 0.2s;
         }
+        .item-text { flex: 1; margin-left: 12px; cursor: pointer; font-weight: 500; }
+        .done { text-decoration: line-through; opacity: 0.5; }
+        .delete-btn { cursor: pointer; color: #ff4d4d; font-weight: bold; padding: 5px 10px; }
 
-        @keyframes slideIn {
-            from { opacity: 0; transform: scale(0.95); }
-        }
-
-        .content-text { flex: 1; margin-left: 10px; cursor: pointer; }
-        .done { text-decoration: line-through; opacity: 0.6; }
-
-        .delete-ico {
-            cursor: pointer;
-            color: #ff4d4d;
-            font-weight: bold;
-            margin-left: 10px;
-        }
-
-        .hidden { display: none; }
+        .hidden { display: none !important; }
     </style>
 </head>
 <body data-theme="light">
 
 <div class="container">
     <header>
-        <h2 id="main-title">Lucruri de făcut</h2>
+        <h2 id="title">Task-uri</h2>
         <button id="theme-toggle" style="background:none; border:none; cursor:pointer; font-size:1.5rem;">🌓</button>
     </header>
 
-    <div class="tabs">
-        <button class="tab-btn active" onclick="switchTab('tasks')">Task-uri</button>
-        <button class="tab-btn" onclick="switchTab('notes')">Notițe</button>
+    <div class="tabs-container">
+        <button id="btn-tasks" class="tab-btn active" onclick="switchTab('tasks')">Task-uri ✅</button>
+        <button id="btn-notes" class="tab-btn" onclick="switchTab('notes')">Listă Simplă 📝</button>
     </div>
 
-    <div id="progress-section" class="progress-container" style="display: block;">
+    <div id="progress-section" class="progress-container">
         <div class="progress-info">
-            <span>Progres</span>
+            <span>Progres Finalizat</span>
             <span id="progress-percent">0%</span>
         </div>
         <div class="bar-outer">
@@ -187,7 +155,7 @@
     </div>
 
     <div class="input-box">
-        <input type="text" id="main-input" placeholder="Adaugă ceva nou...">
+        <input type="text" id="main-input" placeholder="Adaugă ceva...">
         <button class="add-btn" id="add-btn">+</button>
     </div>
 
@@ -196,53 +164,80 @@
 
 <script>
     let currentTab = 'tasks';
-    const tasks = [];
-    const notes = [];
+    let tasks = [];
+    let notes = [];
 
-    const themeToggle = document.getElementById('theme-toggle');
-    const listContainer = document.getElementById('list-container');
     const mainInput = document.getElementById('main-input');
+    const listContainer = document.getElementById('list-container');
+    const progressSection = document.getElementById('progress-section');
     const barInner = document.getElementById('bar-inner');
     const progressPercent = document.getElementById('progress-percent');
-    const progressSection = document.getElementById('progress-section');
+    const title = document.getElementById('title');
 
-    // Dark mode toggle
-    themeToggle.addEventListener('click', () => {
-        const body = document.body;
-        const isDark = body.getAttribute('data-theme') === 'dark';
-        body.setAttribute('data-theme', isDark ? 'light' : 'dark');
-    });
-
+    // Comutare Tab-uri
     function switchTab(tab) {
         currentTab = tab;
-        document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.toggle('active', btn.innerText.toLowerCase().includes(tab === 'tasks' ? 'task' : 'not')));
         
-        document.getElementById('main-title').innerText = tab === 'tasks' ? 'Lucruri de făcut' : 'Lista mea';
-        progressSection.style.display = tab === 'tasks' ? 'block' : 'none';
+        // Update Vizual Butoane
+        document.getElementById('btn-tasks').classList.toggle('active', tab === 'tasks');
+        document.getElementById('btn-notes').classList.toggle('active', tab === 'notes');
+        
+        // Update UI
+        title.innerText = tab === 'tasks' ? 'Task-uri' : 'Listă Simplă';
+        progressSection.classList.toggle('hidden', tab === 'notes');
+        mainInput.placeholder = tab === 'tasks' ? "Ce ai de făcut?" : "Adaugă în listă...";
         
         render();
     }
 
+    // Adăugare Item
+    function addItem() {
+        const text = mainInput.value.trim();
+        if (!text) return;
+
+        const newItem = { text: text, completed: false };
+        if (currentTab === 'tasks') tasks.push(newItem);
+        else notes.push(newItem);
+
+        mainInput.value = '';
+        render();
+    }
+
+    // Randare Listă
     function render() {
         listContainer.innerHTML = '';
-        const currentData = currentTab === 'tasks' ? tasks : notes;
+        const data = (currentTab === 'tasks') ? tasks : notes;
 
-        currentData.forEach((item, index) => {
+        data.forEach((item, index) => {
             const li = document.createElement('li');
             
-            // Checkbox doar pentru tab-ul de task-uri
-            const checkbox = currentTab === 'tasks' ? 
+            // Doar task-urile au checkbox vizibil
+            const checkHtml = currentTab === 'tasks' ? 
                 `<input type="checkbox" ${item.completed ? 'checked' : ''} onchange="toggleItem(${index})">` : '';
 
             li.innerHTML = `
-                ${checkbox}
-                <span class="content-text ${item.completed ? 'done' : ''}" onclick="toggleItem(${index})">${item.text}</span>
-                <span class="delete-ico" onclick="deleteItem(${index})">✕</span>
+                ${checkHtml}
+                <span class="item-text ${item.completed ? 'done' : ''}" onclick="toggleItem(${index})">
+                    ${item.text}
+                </span>
+                <span class="delete-btn" onclick="deleteItem(${index})">✕</span>
             `;
             listContainer.appendChild(li);
         });
 
         if (currentTab === 'tasks') updateProgress();
+    }
+
+    function toggleItem(index) {
+        const data = (currentTab === 'tasks') ? tasks : notes;
+        data[index].completed = !data[index].completed;
+        render();
+    }
+
+    function deleteItem(index) {
+        const data = (currentTab === 'tasks') ? tasks : notes;
+        data.splice(index, 1);
+        render();
     }
 
     function updateProgress() {
@@ -251,40 +246,22 @@
             progressPercent.innerText = '0%';
             return;
         }
-        const completed = tasks.filter(t => t.completed).length;
-        const percent = Math.round((completed / tasks.length) * 100);
-        barInner.style.width = percent + '%';
-        progressPercent.innerText = percent + '%';
+        const done = tasks.filter(t => t.completed).length;
+        const perc = Math.round((done / tasks.length) * 100);
+        barInner.style.width = perc + '%';
+        progressPercent.innerText = perc + '%';
     }
 
-    function addItem() {
-        const val = mainInput.value.trim();
-        if (!val) return;
-
-        const newItem = { text: val, completed: false };
-        if (currentTab === 'tasks') tasks.push(newItem);
-        else notes.push(newItem);
-
-        mainInput.value = '';
-        render();
-    }
-
-    function toggleItem(index) {
-        const data = currentTab === 'tasks' ? tasks : notes;
-        data[index].completed = !data[index].completed;
-        render();
-    }
-
-    function deleteItem(index) {
-        const data = currentTab === 'tasks' ? tasks : notes;
-        data.splice(index, 1);
-        render();
-    }
+    // Dark Mode
+    document.getElementById('theme-toggle').addEventListener('click', () => {
+        const isDark = document.body.getAttribute('data-theme') === 'dark';
+        document.body.setAttribute('data-theme', isDark ? 'light' : 'dark');
+    });
 
     document.getElementById('add-btn').addEventListener('click', addItem);
     mainInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') addItem(); });
 
-    // Render inițial
+    // Pornire
     render();
 </script>
 
